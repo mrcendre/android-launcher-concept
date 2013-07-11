@@ -51,6 +51,20 @@ public class MainActivity extends Activity {
 			}			
 		});
 		
+		homeButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View arg0) {
+				Log.e("Click event", "Home button tapped");
+				myVib.vibrate(50);
+			}			
+		});
+		
+		photoButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View arg0) {
+				Log.e("Click event", "Photo button tapped");
+				myVib.vibrate(50);
+			}			
+		});
+		
 		
 		ImageView view1Object = (ImageView)findViewById(R.id.view1);
 		
