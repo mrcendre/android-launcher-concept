@@ -8,29 +8,68 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <View
-        android:id="@+id/view1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" />
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
 
+	    <ImageView
+	        android:id="@+id/view1"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:contentDescription="@string/empty"
+	        android:scaleType="centerCrop"
+	    />
+
+	    <ImageView
+	        android:id="@+id/imageView1"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:alpha=".4"
+	        android:contentDescription="@string/empty"
+	        android:minHeight="250dp"
+	        android:src="@drawable/lock_gradient" />
+
+  	    <Button
+  	        android:id="@+id/settingsButton"
+  	        android:background="@drawable/settings"
+  	        android:layout_width="55dp"
+  	        android:layout_height="55dp"
+  	        android:layout_gravity="bottom|left"
+  	        android:layout_marginBottom="40dp"
+  	        android:layout_marginLeft="40dp" />
+
+  	    <Button
+  	        android:id="@+id/homeButton"
+  	        android:background="@drawable/home"
+  	        android:layout_width="55dp"
+  	        android:layout_height="55dp"
+  	        android:layout_gravity="bottom|center"
+  	        android:layout_marginBottom="40dp" />
+
+  	    <Button
+  	        android:id="@+id/photoButton"
+  	        android:layout_width="55dp"
+  	        android:layout_height="55dp"
+  	        android:layout_gravity="bottom|right"
+  	        android:layout_marginBottom="40dp"
+  	        android:layout_marginRight="40dp"
+  	        android:background="@drawable/photo" />
+        
+    </FrameLayout>
+    
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="158dp"
-        android:alpha=".8"
-        android:shadowColor="#000000"
+        android:layout_marginTop="190dp"
+        android:shadowColor="#7F000000"
         android:shadowDy="1"
-        android:shadowRadius="4"
-        android:text="10:50"
+        android:shadowRadius="2"
+        android:text="@string/time_placeholder"
         android:textColor="#FFFFFF"
-        android:textSize="88sp" />
+        android:textSize="80sp" />
 
     <TextView
         android:id="@+id/textView2"
@@ -38,15 +77,14 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="9dp"
-        android:layout_marginTop="9dp"
-        android:alpha=".7"
-        android:shadowColor="#FFF"
+        android:layout_marginLeft="11dp"
+        android:layout_marginTop="12dp"
+        android:shadowColor="#7F000000"
         android:shadowDy="1"
         android:shadowRadius="3"
-        android:text="Guillaume&apos;s phone"
+        android:text="@string/undefined_username"
         android:textColor="#FFFFFF"
-        android:textSize="15sp" />
+        android:textSize="17sp" />
 
     <TextView
         android:id="@+id/textView3"
@@ -54,6 +92,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView1"
         android:layout_centerHorizontal="true"
-        android:text="You have 3 new notifications" />
+        android:layout_marginTop="20dp"
+        android:text="8 notifications"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
 
 </RelativeLayout>

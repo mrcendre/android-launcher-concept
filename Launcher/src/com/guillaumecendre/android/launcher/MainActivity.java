@@ -1,65 +1,114 @@
 package com.guillaumecendre.android.launcher;
 
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+
+import android.os.Vibrator;
+import android.graphics.Matrix;
 import android.os.Bundle;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-	@Override
+    private Vibrator myVib;
+	
+	@Override	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+        myVib = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
+
+		Button settingsButton = (Button)findViewById(R.id.settingsButton);
+		Button homeButton = (Button)findViewById(R.id.homeButton);
+		Button photoButton = (Button)findViewById(R.id.photoButton);
+		
+		settingsButton.setHapticFeedbackEnabled(true);
+		homeButton.setHapticFeedbackEnabled(true);
+		photoButton.setHapticFeedbackEnabled(true);
+		
+		settingsButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View arg0) {
+				Log.e("Click event", "Settings button tapped");
+				myVib.vibrate(50);
+			}			
+		});
+		
+		
+		ImageView view1Object = (ImageView)findViewById(R.id.view1);
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
-		int screenWidth = size.x;
+		
 		int screenHeight = size.y;
-		int ratio = (screenWidth*100)/screenHeight;
+		int screenWidth = size.x;
 		
-		View view1Object = (View)findViewById(R.id.view1);
-		view1Object.setBackgroundColor(Color.BLACK);
-		view1Object.setAlpha(0.6f);
-//////////////////////////////////////////////	//////////////////////////////////////	//////////////////////////////////////	//////////////////////////////////////		
 		
-		Bitmap originBmp = BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper);
+		BitmapFactory.Options bitmapOpts = new BitmapFactory.Options();
+		bitmapOpts.inSampleSize = 2;
+		Bitmap firstLoadedBmp = BitmapFactory.decodeResource(getResources(), R.drawable.ls, bitmapOpts);
 		
-		Bitmap blurredBitmap = this.fastblur(originBmp, 4);
-		originBmp.recycle();
-		//Bitmap blurredBitmap = originBmp;
+		/*Bitmap scaledBitmap = resizeBitmapWhileKeepingRatio(firstLoadedBmp, screenHeight);
+		firstLoadedBmp.recycle();
+		Bitmap croppedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, screenWidth, screenHeight);
+		scaledBitmap.recycle();
 		
-		int widthToTake = ((blurredBitmap.getHeight()*ratio)/100);
+		if (firstLoadedBmp.getHeight() > screenHeight) {
+			//croppedBitmap = Bitmap.createBitmap(firstLoadedBmp, 0, 0, widthToTake, screenHeight);
+		} else {
+			//croppedBitmap = Bitmap.createScaledBitmap(firstLoadedBmp, screenHeight+(), screenHeight, true);
+		}*/
 		
-		Log.i(null, "Will crop at " + widthToTake + "x" + blurredBitmap.getHeight() + " with ratio=" + ratio);
-		Bitmap bmp = Bitmap.createBitmap(blurredBitmap, (blurredBitmap.getWidth()/2)-(screenWidth/2), (blurredBitmap.getHeight()/2)-(screenHeight/2), widthToTake, blurredBitmap.getHeight()/*screenWidth, screenHeight*/);
-		blurredBitmap.recycle();
+		Bitmap blurredBmp = this.fastblur(firstLoadedBmp, 5);
 		
-		Bitmap scaledBitmap = Bitmap.createScaledBitmap(bmp, screenWidth, screenHeight, true);
-		bmp.recycle();
+		firstLoadedBmp.recycle();
+		view1Object.setImageBitmap(blurredBmp);
 		
-		Drawable backgroundImage = new BitmapDrawable(getResources(), scaledBitmap);
-		//bmp.recycle();
-		
-////////////////////////////////////////////////////////////////////////////////////	//////////////////////////////////////	//////////////////////////////////////		
-		view1Object.setBackgroundDrawable(backgroundImage);
 		
 		TextView textView1Object = (TextView)findViewById(R.id.textView1);
-		TextView textView2Object = (TextView)findViewById(R.id.textView2);
-		Typeface tfThin = Typeface.createFromAsset(getAssets(), "Roboto-Thin.ttf");
-		textView1Object.setTypeface(tfThin);
-		textView2Object.setTypeface(tfThin);		
+		TextView textView2Object = (TextView)findViewById(R.id.textView2);		
+		TextView textView3Object = (TextView)findViewById(R.id.textView3);		
+		
+		textView2Object.setText(getUsername()+"'s phone");
+		
+		
+		Calendar calendar1 = Calendar.getInstance();
+		String hourOfDay = "00";
+		String minute = "00";
+		if (calendar1.get(Calendar.MINUTE) < 10) {
+			minute = "0" + calendar1.get(Calendar.MINUTE);
+		} else {
+			minute = "" + calendar1.get(Calendar.MINUTE);
+		}		
+		
+		hourOfDay = "" + calendar1.get(Calendar.HOUR_OF_DAY);
+		textView1Object.setText(hourOfDay + ":" + minute);
+		
+		
+		
+		Typeface latoLight = Typeface.createFromAsset(getAssets(), "Lato-Light.ttf");
+		Typeface latoHairline = Typeface.createFromAsset(getAssets(), "Lato-Hairline.ttf");
+		textView1Object.setTypeface(latoHairline);
+		textView2Object.setTypeface(latoLight);		
+		textView3Object.setTypeface(latoLight);		
 		
 	}
 
@@ -71,6 +120,41 @@ public class MainActivity extends Activity {
 	}
 	
 	
+	public Bitmap resizeBitmapWhileKeepingRatio(Bitmap srcBitmap, int i_height) {
+		
+		int oldHeight = srcBitmap.getHeight();
+		int scaleFactor = i_height / oldHeight;
+		
+		int newWidth = srcBitmap.getWidth() * scaleFactor;
+		int newHeight = oldHeight * scaleFactor;
+		
+		Bitmap resizedBmp = Bitmap.createScaledBitmap(srcBitmap, newWidth, newHeight, true);
+		
+		return resizedBmp;
+	}
+	
+	
+	public String getUsername(){
+	    AccountManager manager = AccountManager.get(this); 
+	    Account[] accounts = manager.getAccountsByType("com.google"); 
+	    List<String> possibleEmails = new LinkedList<String>();
+
+	    for (Account account : accounts) {
+	      // TODO: Check possibleEmail against an email regex or treat
+	      // account.name as an email address only for certain account.type values.
+	      possibleEmails.add(account.name);
+	    }
+
+	    if(!possibleEmails.isEmpty() && possibleEmails.get(0) != null){
+	        String email = possibleEmails.get(0);
+	        String[] parts = email.split("@");
+	        if(parts.length > 0 && parts[0] != null)
+	            return parts[0];
+	        else
+	            return null;
+	    }else
+	        return null;
+	}
 	
 	
 	
